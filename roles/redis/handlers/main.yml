@@ -1,0 +1,14 @@
+---
+- name: Stop redis
+  become: true
+  ansible.builtin.systemd:
+    enabled: true
+    name: redis-server
+    state: stopped
+
+- name: Start redis
+  become: true
+  ansible.builtin.systemd:
+    enabled: true
+    name: redis-server
+    state: started

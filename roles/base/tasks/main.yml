@@ -1,0 +1,47 @@
+---
+- name: Stop Apache
+  become: true
+  ansible.builtin.systemd:
+    name: apache2.service
+    state: stopped
+
+- name: Update package cache
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Update all installed packages
+  become: true
+  ansible.builtin.apt:
+    upgrade: dist
+    force_apt_get: true
+    update_cache: true
+    autoremove: true
+    autoclean: true
+
+- name: Install packages
+  become: true
+  ansible.builtin.apt:
+    force_apt_get: true
+    update_cache: true
+    name:
+      - apt-transport-https
+      - git
+      - unzip
+      - ca-certificates
+      - curl
+      - console-data
+      - python3
+      - python-pip
+      - python3-pip
+    state: present
+
+- name: Change keyboard fr
+  become: true
+  ansible.builtin.command: loadkeys fr
+  changed_when: false
+
+- name: Set timezone to Paris
+  become: true
+  community.general.timezone:
+    name: Europe/Paris

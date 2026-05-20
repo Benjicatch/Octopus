@@ -1,0 +1,17 @@
+[Unit]
+Description=worker
+After=newtwork.target
+
+[Service]
+Environment=REDIS_HOST={{ hostvars[groups['redis'][0]].ansible_host }}
+Environment=POSTGRESQL_USER={{ postgresql_user }}
+Environment=POSTGRESQL_PASSWORD={{ postgresql_passwd }}
+Environment=POSTGRESQL_HOST={{ hostvars[groups['postgres'][0]].ansible_host }}
+Environment=POSTGRESQL_PORT=5432
+Environment=POSTGRESQL_DB={{ postgresql_db }}
+Type=simple
+ExecStart=/usr/bin/java -jar /tmp/worker/target/worker-jar-with-dependencies.jar
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

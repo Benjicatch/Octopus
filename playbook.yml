@@ -1,0 +1,30 @@
+---
+- name: Setup Basic installation
+  hosts: all
+  roles:
+    - base
+
+- name: Redis Setup
+  hosts: redis
+  roles:
+    - redis
+
+- name: PostgreSQL Setup
+  hosts: postgres
+  roles:
+    - postgresql
+
+- name: Deploy Poll App
+  hosts: poll
+  roles:
+    - poll
+
+- name: Deploy Result App
+  hosts: result
+  roles:
+    - result
+
+- name: Deploy Worker App
+  hosts: worker
+  roles:
+    - worker

@@ -1,0 +1,33 @@
+---
+- name: Install maven
+  become: true
+  ansible.builtin.apt:
+    force_apt_get: true
+    update_cache: true
+    name:
+      - maven
+      - default-jdk
+    state: present
+
+- name: Unzip worker
+  ansible.builtin.unarchive:
+    src: ./worker.tar
+    dest: /tmp/
+    mode: "0755"
+    extra_opts:
+      - --no-same-owner
+
+- name: Install dependencies
+  become: true
+  ansible.builtin.command: mvn install -f /tmp/worker/pom.xml
+  changed_when: false
+
+- name: Copy systemd service file to server
+  become: true
+  ansible.builtin.template:
+    src: worker.service.j2
+    dest: /etc/systemd/system/worker.service
+    mode: "0644"
+  vars:
+    hostname: "{{ ansible_hostname }}"
+  notify: restart worker

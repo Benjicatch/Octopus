@@ -1,0 +1,103 @@
+---
+- name: Install necessay packages for postgres
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+    force_apt_get: true
+    name:
+      - gnupg2
+      - gpg
+      - libpq-dev
+      - python3-dev
+    state: present
+
+- name: Make sure psycopg2 is installed
+  become: true
+  ansible.builtin.pip:
+    name: psycopg2
+    state: present
+
+- name: Install key
+  become: true
+  ansible.builtin.apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: Add postreSQL repo
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb https://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+    state: present
+    filename: pgdg
+
+- name: Install postreSQL
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+    force_apt_get: true
+    name:
+      - postgresql-12
+      - postgresql-client-12
+    state: present
+
+- name: Copy sql
+  become: true
+  ansible.builtin.copy:
+    src: schema.sql
+    dest: ./
+    mode: "0644"
+
+- name: Copy pg_hba
+  become: true
+  ansible.builtin.copy:
+    src: pg_hba.conf
+    dest: /etc/postgresql/12/main/pg_hba.conf
+    mode: "0644"
+
+- name: Create db paul
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ postgresql_db }}"
+
+- name: Run queries from SQL script
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_script:
+    login_db: "{{ postgresql_db }}"
+    path: ./schema.sql
+
+- name: Create paul user
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    login_db: "{{ postgresql_db }}"
+    name: "{{ postgresql_user }}"
+    password: "{{ postgresql_passwd }}"
+    state: present
+
+- name: Give limited permissions
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_privs:
+    login_db: "{{ postgresql_db }}"
+    role: "{{ postgresql_user }}"
+    privs: SELECT,INSERT,UPDATE
+    state: present
+    objs: ALL_IN_SCHEMA
+
+- name: Change listen_addresses
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/postgresql/12/main/postgresql.conf
+    regexp: "listen_addresses ="
+    line: "listen_addresses = '*'"
+    state: present
+
+- name: Start postgresql
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: postgresql.service
+    state: restarted
+    enabled: true

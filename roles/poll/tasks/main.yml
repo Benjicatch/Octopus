@@ -1,0 +1,24 @@
+---
+- name: Unzip poll
+  ansible.builtin.unarchive:
+    src: ./poll.tar
+    dest: /tmp/
+    mode: "0755"
+    extra_opts:
+      - --no-same-owner
+
+- name: Install python requirements
+  become: true
+  ansible.builtin.pip:
+    requirements: /tmp/poll/requirements.txt
+    state: present
+
+- name: Copy systemd service file to server
+  become: true
+  ansible.builtin.template:
+    src: poll.service.j2
+    dest: /etc/systemd/system/poll.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart poll

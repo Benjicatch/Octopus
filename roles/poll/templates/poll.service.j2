@@ -1,0 +1,13 @@
+[Unit]
+Description=poll
+After=newtwork.target
+
+[Service]
+Environment=REDIS_HOST={{ hostvars[groups['redis'][0]].ansible_host }}
+Type=simple
+WorkingDirectory=/tmp/poll/
+ExecStart=flask run --host=0.0.0.0 --port={{ poll_port }}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

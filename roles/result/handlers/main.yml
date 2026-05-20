@@ -1,0 +1,8 @@
+---
+- name: Restart result
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: result.service
+    state: restarted
+    enabled: true
