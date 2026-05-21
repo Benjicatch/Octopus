@@ -1,4 +1,4 @@
-# 🐙 Octopus
+# 🐙 Octopus — Distributed Application Deployment with Ansible
 
 > Deploy a distributed voting application across 5 machines using Ansible — no containers allowed.
 
