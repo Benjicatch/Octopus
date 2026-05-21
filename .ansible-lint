@@ -1,0 +1,29 @@
+---
+profile: production
+
+exclude_paths:
+  - .cache/
+  - .git/
+  - molecule/
+  - tests/
+  - .yamllint
+
+skip_list: []
+warn_list:
+  - experimental
+  - role-name
+
+use_default_rules: true
+verbosity: 1
+
+enable_list:
+  - args
+  - empty-string-compare
+  - no-log-password
+  - no-same-owner
+  - yaml
+  - fqcn
+  - name[casing]
+
+write_list:
+  - all

@@ -1,0 +1,21 @@
+---
+name: ansible-lint
+
+on:
+  push:
+    branches: [main, dev]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Ansible Lint
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install ansible-lint
+
+      - name: Run YAML Lint
+        run: yamllint -c .yamllint .
+
+      - name: Run Ansible Lint
+        run: ansible-lint .
